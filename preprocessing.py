@@ -7,15 +7,15 @@ import pickle
 url = "https://drive.google.com/uc?export=download&id=1oFn9nfrL1sx2XvRBwysffu66waHX7Sm4"
 df = pd.read_csv(url)
 
-# Drop duplicates and rows with critical missing values
+# Drop duplicates and rows with missing values
 df.drop_duplicates(inplace=True)
 df.dropna(subset=['name', 'city', 'cuisine', 'cost', 'rating'], inplace=True)
 
-# Clean 'cost' column (e.g., '₹ 200' -> 200)
+# Clean 'cost' column ('₹ 200' -> 200)
 df['cost'] = df['cost'].astype(str).str.replace('₹', '', regex=False).str.replace(',', '', regex=False).str.strip()
 df['cost'] = pd.to_numeric(df['cost'], errors='coerce')
 
-# Ensure rating is numeric too
+# Ensure rating is numeric
 df['rating'] = pd.to_numeric(df['rating'], errors='coerce')
 
 # Drop rows with invalid 'cost' or 'rating'
@@ -25,12 +25,8 @@ df.dropna(subset=['cost', 'rating'], inplace=True)
 df.to_csv("cleaned_data.csv", index=False)
 print("✅ cleaned_data.csv saved")
 
-# --- One-Hot Encoding ---
-# Prepare the encoder
+# One Hot Encoding
 encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False)
-
-
-# OneHot encode categorical features (city and cuisine)
 encoded_data = encoder.fit_transform(df[['city', 'cuisine']])
 
 # Convert to DataFrame with correct column names
@@ -52,3 +48,4 @@ print("✅ encoded_data.csv saved")
 with open("encoder.pkl", "wb") as f:
     pickle.dump(encoder, f)
 print("✅ encoder.pkl saved")
+
